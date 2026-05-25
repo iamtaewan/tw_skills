@@ -131,7 +131,16 @@ description: Use this skill when the user asks to create, review, or transform a
 
 ## Mac에 설치하는 방법
 
-가장 단순하고 관리하기 좋은 방식은 GitHub repository를 clone한 뒤, 각 skill 폴더를 `~/.codex/skills`에 symlink로 연결하는 것입니다.
+가장 단순하고 운영 혼선을 줄이는 방식은 GitHub repository를 clone한 뒤, 설치 스크립트로 각 skill 폴더를 `~/.codex/skills`에 물리 복사하는 것입니다.
+
+기본 설치는 copy install입니다.
+
+- 기존 `~/.codex/skills/<skill>` 설치본을 제거한다.
+- repository의 `skills/<skill>`을 물리 복사한다.
+- 설치된 skill은 다음 설치 전까지 고정된다.
+- repository에서 작업 중인 변경이 즉시 Codex에 섞이지 않는다.
+
+개발 중 live 반영이 필요할 때만 `--link` 옵션으로 symlink 설치를 사용합니다.
 
 ### 1. Repository clone
 
@@ -146,14 +155,17 @@ cd my-codex-skills
 mkdir -p ~/.codex/skills
 ```
 
-### 3. Skill symlink 생성
+### 3. Skill 설치
 
 ```bash
-ln -s "$(pwd)/skills/oci-helper" ~/.codex/skills/oci-helper
-ln -s "$(pwd)/skills/report-writer" ~/.codex/skills/report-writer
+bash scripts/install.sh
 ```
 
-symlink 방식을 쓰면 GitHub repository에서 `git pull`만 해도 설치된 skill이 함께 최신화됩니다.
+개발용 symlink 설치가 필요하면 다음 명령을 사용합니다.
+
+```bash
+bash scripts/install.sh --link
+```
 
 ### 4. 설치 확인
 
@@ -173,6 +185,38 @@ repository에 `scripts/install.sh`를 두면 여러 skill을 한 번에 설치�
 #!/usr/bin/env bash
 set -euo pipefail
 
+usage() {
+  cat <<'USAGE'
+Usage: scripts/install.sh [--copy|--link]
+
+Default:
+  --copy  Remove the existing installed skill target, then copy a fresh physical
+          snapshot from this repository.
+
+Development:
+  --link  Remove the existing installed skill target, then symlink it to this
+          repository for live editing.
+USAGE
+}
+
+mode="copy"
+case "${1:-}" in
+  ""|--copy)
+    mode="copy"
+    ;;
+  --link)
+    mode="link"
+    ;;
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac
+
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CODEX_SKILLS_DIR="${CODEX_HOME:-$HOME/.codex}/skills"
 
@@ -184,11 +228,19 @@ for skill_dir in "$REPO_ROOT"/skills/*; do
   skill_name="$(basename "$skill_dir")"
   target="$CODEX_SKILLS_DIR/$skill_name"
 
-  if [ -e "$target" ]; then
-    echo "skip: $skill_name already exists"
-  else
+  if [ -e "$target" ] || [ -L "$target" ]; then
+    rm -rf "$target"
+    echo "removed: $skill_name"
+  fi
+
+  if [ "$mode" = "link" ]; then
     ln -s "$skill_dir" "$target"
-    echo "installed: $skill_name"
+    echo "installed(link): $skill_name"
+  else
+    mkdir -p "$target"
+    cp -R "$skill_dir"/. "$target"/
+    find "$target" -name '.DS_Store' -delete
+    echo "installed(copy): $skill_name"
   fi
 done
 
@@ -204,14 +256,17 @@ chmod +x scripts/install.sh
 
 ## Skill 업데이트 방법
 
-symlink 방식으로 설치했다면 업데이트는 간단합니다.
+copy install 방식에서는 `git pull` 후 설치 스크립트를 다시 실행합니다.
 
 ```bash
 cd my-codex-skills
 git pull
+bash scripts/install.sh
 ```
 
 이후 Codex를 재시작하면 최신 skill 내용이 반영됩니다.
+
+개발 중 symlink 방식으로 설치한 경우에는 `git pull`만으로 repository 변경이 설치본에 즉시 반영됩니다. 이 방식은 개발용으로만 사용합니다.
 
 ## 운영 팁
 
@@ -221,6 +276,7 @@ git pull
 - 긴 예시, 정책, API 설명은 `references/`로 분리합니다.
 - HTML 문서는 가능하면 `docs/*.md`에서 생성되게 해서 중복 관리를 줄입니다.
 - `description`에는 skill이 사용되어야 하는 상황을 구체적으로 씁니다.
+- 기본 설치는 copy install로 운영하고, symlink는 개발용으로만 사용합니다.
 - 설치 후에는 Codex를 재시작해야 새 skill이 인식됩니다.
 
 ## 권장 작성 원칙

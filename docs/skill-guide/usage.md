@@ -16,5 +16,12 @@ repository 루트에서 다음 명령을 실행합니다.
 bash scripts/install.sh
 ```
 
-설치 후 Codex를 재시작합니다.
+기본 설치는 copy install입니다. 기존 `~/.codex/skills/<skill>` 설치본을 제거하고 repository의 skill을 물리 복사합니다.
 
+개발 중 repository 변경을 즉시 Codex에 반영해야 할 때만 symlink 모드를 사용합니다.
+
+```bash
+bash scripts/install.sh --link
+```
+
+설치 후 Codex를 재시작합니다.

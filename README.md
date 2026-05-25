@@ -46,4 +46,12 @@ my_skills/
 bash scripts/install.sh
 ```
 
+기본 설치는 기존 설치본을 제거한 뒤 물리 복사합니다. 설치된 skill은 다음 설치 전까지 고정되므로 repository 작업 중 변경이 즉시 Codex에 섞이지 않습니다.
+
+개발 중 실시간 반영이 필요할 때만 symlink 모드를 사용합니다.
+
+```bash
+bash scripts/install.sh --link
+```
+
 설치 후 Codex를 재시작하면 새 skill이 인식됩니다.
