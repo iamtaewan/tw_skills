@@ -388,6 +388,7 @@ sudo dnf -y module enable nodejs:24
 ```bash
 sudo dnf install -y \
   git \
+  tmux \
   python3.12 \
   python3.12-pip \
   nodejs \
@@ -517,6 +518,7 @@ ssh taewan-ol9-dev
 
 ```bash
 git --version
+tmux -V
 python3.12 --version
 node --version
 npm --version
@@ -530,6 +532,7 @@ codex --version
 
 ```text
 git version 2.47.3
+tmux 3.5a
 Python 3.12.12
 Node.js v24.14.1
 npm 11.11.0

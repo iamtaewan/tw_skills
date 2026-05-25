@@ -55,7 +55,7 @@ If the VM name is missing, ask for it before doing any OCI lookup or creation.
 13. Before launching the VM, show a concise final summary of values to be created and state that OCI resources may incur cost.
 14. Launch the VM using OCI CLI.
 15. Query public IP and verify SSH connectivity.
-16. Install git, OCI CLI, uv, Python 3.12, Claude Code, and Codex on the VM.
+16. Install git, tmux, OCI CLI, uv, Python 3.12, Claude Code, and Codex on the VM.
 17. If remote OCI CLI use is required, copy `~/.oci/config` and the API key to the VM, fix `key_file`, restrict permissions, and explicitly mention that the API key is a private credential.
 18. Test OCI CLI from the VM.
 19. Back up local `~/.ssh/config`, then add a host alias so `ssh {vm name}` connects to the VM.
