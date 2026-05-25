@@ -1,0 +1,4 @@
+display_name: OCI VM
+short_description: Create and initialize OCI Compute VMs when explicitly invoked.
+default_prompt: "oci_vm: create an OCI VM named <vm-name>"
+

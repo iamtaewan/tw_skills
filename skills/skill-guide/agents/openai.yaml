@@ -1,0 +1,4 @@
+display_name: Skill Guide
+short_description: Organize and install Codex skills from a GitHub-style repository.
+default_prompt: Help me structure, install, or validate Codex skills.
+
